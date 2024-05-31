@@ -8,6 +8,179 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+
+
+
+    <style>
+        
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    font-size: large;
+    font-weight:500;
+}
+/* html, body {
+    height: 100%;
+} */
+body > * {
+    /* width: 100%; */
+    height: 100%;
+}
+#navbar{
+    align-items: center;
+    border: 2px solid black;
+    height: 3rem;
+    background-color: #ffc0cb;
+    display: flex;
+    margin-bottom: 0px;
+}
+#left{
+    align-items: center;
+    justify-content: left;
+}
+#logo{
+    height: 2rem;
+    width: 8rem;
+    margin-left:0.5rem;
+    margin-top:0.3rem;
+    margin-right: 2rem;
+}
+#center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* margin-left:16rem;   */
+}
+.categories{
+    margin: 0rem 1rem;
+    padding: 0.2rem 1rem;
+}
+.categories:hover{
+    cursor: pointer;
+}
+#right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+    flex: 1;
+}
+
+#searchbox {
+    border-radius: 0.3rem;
+    padding-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+#searchbutton {
+    color: white;
+    background-color: #e62a49;
+    padding: 1px 6px;
+    border-radius: 0.3rem;
+    margin-right: 1rem;
+}
+
+#searchbutton:hover {
+    background-color: #bd0826;
+}
+
+#news-title{
+    font-weight: 700;
+}
+#news-source{
+    font-style: italic;
+    font-size: smaller;
+}
+
+main {
+    padding-block: 80px;
+    /* padding: 2rem 3rem; */
+    margin: 1rem 5rem;
+    /* border: 2px solid blue; */
+} 
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Adjust as needed */
+}
+
+.card {
+    width: calc(32% - 20px);
+    margin-bottom: 40px; 
+    box-sizing: border-box;
+    box-shadow: 0 0 5px #000000;
+    border-radius: 5px;
+    cursor: pointer;
+    color: black;
+    background-color:#e9e3e4;
+    transition: all 0.4s ease;
+    overflow:hidden;
+
+}
+
+.card:hover{ 
+    transform: translateY(-3px);
+    box-shadow: 1px 1px 8px #000000;
+    background-color: #ffc0cb;
+}
+
+.card-header,
+.card-content {
+    
+    padding: 10px;
+}
+
+.card img {
+    max-width: 100%;
+}
+
+
+/* 
+.cards-container{
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 20px;
+    align-items: start;
+    display: flex;
+}
+
+.card{
+    width: 400px;
+    min-height: 400px;
+    box-shadow: 0 0 5px #000000;
+    border-radius: 5px;
+    cursor: pointer;
+    color: black;
+    background-color:#e9e3e4;
+    margin: 1rem 2rem;
+    overflow:hidden;
+    transition: all 0.2s ease;
+}
+
+.card:hover{ 
+    transform: translateY(-2px);
+    box-shadow: 1px 1px 8px #000000;
+    background-color: #ffc0cb;
+}
+.photu{
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.news-title{
+    
+}
+.news-source{
+    padding-block: 12px;
+} */
+    </style>
+
+
+
+
+    
 </head>
 <body>
     <nav>
@@ -45,6 +218,68 @@
         </div>
     </template>
 
-    <script src="javascript.js"></script>
+    <script>
+
+        const API_KEY = "14e5cc4ea50d4f75adb650a15a21aaba";
+const url = "https://newsapi.org/v2/everything?q=";
+
+window.addEventListener('load', () => fetchNews("Narendra Modi"));
+
+async function fetchNews(query) {
+    const response = await fetch(`${url}${query}&apiKey=${API_KEY}`);
+    const data = await response.json();
+    console.log(data);
+    bindData(data.articles);
+}
+
+function bindData(articles){
+    const cardsContainer=document.getElementById('cards-container');
+    const newsCardTemplate = document.getElementById('template-news-card');
+
+    cardsContainer.innerHTML='';
+
+    articles.forEach(article=>{
+        if(!article.urlToImage) return;
+        const cardClone = newsCardTemplate.content.cloneNode(true);
+        fillDataInCard(cardClone,article);
+        cardsContainer.appendChild(cardClone);
+    });
+}
+
+function fillDataInCard(cardClone,article){
+    const newsImg = cardClone.querySelector("#news-img");
+    const newsTitle = cardClone.querySelector("#news-title");
+    const newsSource = cardClone.querySelector("#news-source");
+    const newsDesc = cardClone.querySelector("#news-desc");
+
+    newsImg.src = article.urlToImage;
+    newsTitle.textContent = article.title;
+    newsDesc.textContent = article.description;
+
+    const date = new Date(article.publishedAt).toLocaleString("en-US", {
+        timeZone: "Asia/Jakarta",
+    });
+
+    newsSource.textContent = `${article.source.name} · ${date}`;
+
+    cardClone.firstElementChild.addEventListener("click", () => {
+        window.open(article.url, "_blank");
+    });
+}
+
+
+
+const searchButton = document.getElementById("searchbutton");
+const searchText = document.getElementById("searchbox");
+
+searchButton.addEventListener("click", () => {
+    const query = searchText.value;
+    if (!query) return;
+    fetchNews(query);
+});
+
+
+
+    </script>
 </body>
 </html>
